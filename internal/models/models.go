@@ -499,6 +499,13 @@ func (s *DebateSession) SetRound(r int) {
 	s.Round = r
 }
 
+// GetRound safely returns the current round.
+func (s *DebateSession) GetRound() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.Round
+}
+
 // SetVerdict safely sets the verdict.
 func (s *DebateSession) SetVerdict(v *Verdict) {
 	s.mu.Lock()

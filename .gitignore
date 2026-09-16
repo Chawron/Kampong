@@ -10,8 +10,10 @@ api.txt
 
 # Built binary
 kampong.exe
+kampong.exe~
 kampong
 *.exe
+*.exe~
 
 # Runtime data
 data/

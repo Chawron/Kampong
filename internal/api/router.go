@@ -370,7 +370,7 @@ func (s *Server) handleDebateStatus(w http.ResponseWriter, r *http.Request) {
 		"topic":        session.Topic,
 		"mode":         session.Mode,
 		"status":       session.GetStatus(),
-		"round":        session.Round,
+		"round":        session.GetRound(),
 		"total_rounds": session.TotalRounds,
 		"agents":       session.Agents,
 		"verdict":      session.GetVerdict(),
@@ -498,8 +498,11 @@ func (s *Server) handleSocialSimulation(w http.ResponseWriter, r *http.Request) 
 		},
 	})
 
-	// Run the simulation
-	result, err := social.RunSimulation(r.Context(), s.llmClient, session.Topic, verdictText, synthesisText)
+	// Run the simulation — use Background context so the 60s middleware
+	// timeout doesn't kill a long-running LLM call.
+	simCtx, simCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer simCancel()
+	result, err := social.RunSimulation(simCtx, s.llmClient, session.Topic, verdictText, synthesisText)
 	if err != nil {
 		log.Printf("SOCIAL SIMULATION ERROR [%s]: %v", session.ID, err)
 		http.Error(w, `{"error":"social simulation failed: `+err.Error()+`"}`, http.StatusInternalServerError)
@@ -852,10 +855,10 @@ func (s *Server) handleListDebates(w http.ResponseWriter, r *http.Request) {
 			ID:         sess.ID,
 			Topic:      sess.Topic,
 			Mode:       string(sess.Mode),
-			Status:     string(sess.Status),
+			Status:     string(sess.GetStatus()),
 			Agents:     len(sess.Agents),
-			Rounds:     sess.Round,
-			HasVerdict: sess.Verdict != nil,
+			Rounds:     sess.GetRound(),
+			HasVerdict: sess.GetVerdict() != nil,
 			IsActive:   true,
 		})
 	}
@@ -990,8 +993,11 @@ func (s *Server) handleFileUpload(w http.ResponseWriter, r *http.Request) {
 		fileType = "image"
 		isImage = true
 
-		// Analyze image with vision model if available
-		analysisResult = s.analyzeImage(r.Context(), filePath, mime)
+		// Use a separate context with a longer timeout for vision analysis —
+		// the 60s middleware timeout is too short for large image processing.
+		imgCtx, imgCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+		defer imgCancel()
+		analysisResult = s.analyzeImage(imgCtx, filePath, mime)
 	}
 
 	// Read file content for text-based files
