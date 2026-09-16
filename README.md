@@ -1,5 +1,7 @@
 # Kampong — AI Expert Debate Arena
 
+<img width="275" height="153" alt="Gemini_Generated_Image_rk0tdmrk0tdmrk0t" src="https://github.com/user-attachments/assets/1870c192-1760-4f03-91ff-ca16ed51b0d5" />
+
 **Kampong** is an AI-powered debate and discussion system. It assembles a panel of expert AI agents, has them research the web, debate each other in structured rounds, and delivers a judge's verdict or a synthesized set of insights — all streamed live to a browser with a real-time knowledge graph.
 
 ## How It Works
