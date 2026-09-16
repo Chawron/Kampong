@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Case Input - Kampong</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/medical.css">
+</head>
+<body>
+    <div class="medical-input-container">
+        <header class="medical-header">
+            <h1>🏥 Medical Case Discussion</h1>
+            <p class="disclaimer-banner">
+                ⚠️ FOR EDUCATIONAL PURPOSES ONLY - NOT MEDICAL ADVICE
+            </p>
+        </header>
+
+        <!-- Consent Modal -->
+        <div id="consent-modal" class="modal">
+            <div class="modal-content">
+                <h2>Informed Consent Required</h2>
+                <div class="consent-text" id="consent-text"></div>
+                <div class="consent-actions">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="consent-checkbox">
+                        <span>I have read, understood, and agree to the terms above</span>
+                    </label>
+                    <button id="accept-consent-btn" class="btn-primary" disabled>Accept & Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Case Input Form -->
+        <form id="medical-case-form" class="medical-form" style="display:none;">
+            <!-- Patient Information -->
+            <section class="form-section">
+                <h2>👤 Patient Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="patient-age">Age</label>
+                        <input type="number" id="patient-age" min="0" max="150" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-sex">Sex</label>
+                        <select id="patient-sex" required>
+                            <option value="">Select...</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-weight">Weight (kg)</label>
+                        <input type="number" id="patient-weight" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-height">Height (cm)</label>
+                        <input type="number" id="patient-height" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-smoking">Smoking Status</label>
+                        <select id="patient-smoking">
+                            <option value="never">Never</option>
+                            <option value="former">Former</option>
+                            <option value="current">Current</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="patient-alcohol">Alcohol Use</label>
+                        <select id="patient-alcohol">
+                            <option value="none">None</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="heavy">Heavy</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Symptoms -->
+            <section class="form-section">
+                <h2>🤒 Symptoms</h2>
+                <div id="symptoms-container"></div>
+                <button type="button" id="add-symptom-btn" class="btn-secondary">+ Add Symptom</button>
+            </section>
+
+            <!-- Vital Signs -->
+            <section class="form-section">
+                <h2>💓 Vital Signs</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="vital-temp">Temperature (°C)</label>
+                        <input type="number" id="vital-temp" step="0.1" min="30" max="45">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-hr">Heart Rate (bpm)</label>
+                        <input type="number" id="vital-hr" min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-bp">Blood Pressure</label>
+                        <input type="text" id="vital-bp" placeholder="120/80">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-rr">Respiratory Rate</label>
+                        <input type="number" id="vital-rr" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-spo2">SpO2 (%)</label>
+                        <input type="number" id="vital-spo2" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="vital-pain">Pain Score (0-10)</label>
+                        <input type="number" id="vital-pain" min="0" max="10">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Medical History -->
+            <section class="form-section">
+                <h2>📋 Medical History</h2>
+                <div class="form-group">
+                    <label for="history-conditions">Past Conditions</label>
+                    <textarea id="history-conditions" placeholder="e.g., Hypertension, Diabetes, Asthma..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="history-surgeries">Surgeries</label>
+                    <textarea id="history-surgeries" placeholder="e.g., Appendectomy (2010), Knee replacement (2018)..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="history-family">Family History</label>
+                    <textarea id="history-family" placeholder="e.g., Father: Heart disease, Mother: Diabetes..."></textarea>
+                </div>
+            </section>
+
+            <!-- Current Medications -->
+            <section class="form-section">
+                <h2>💊 Current Medications</h2>
+                <div id="medications-container"></div>
+                <button type="button" id="add-medication-btn" class="btn-secondary">+ Add Medication</button>
+            </section>
+
+            <!-- Allergies -->
+            <section class="form-section">
+                <h2>⚠️ Allergies</h2>
+                <div class="form-group">
+                    <label for="allergies">Known Allergies</label>
+                    <textarea id="allergies" placeholder="e.g., Penicillin, Sulfa drugs, Latex..."></textarea>
+                </div>
+            </section>
+
+            <!-- Lab Results -->
+            <section class="form-section">
+                <h2>🔬 Lab Results</h2>
+                <div id="labs-container"></div>
+                <button type="button" id="add-lab-btn" class="btn-secondary">+ Add Lab Result</button>
+            </section>
+
+            <!-- Medical Imaging -->
+            <section class="form-section">
+                <h2>🩻 Medical Imaging</h2>
+                <p class="section-help">Upload X-rays, CT scans, MRI, ultrasound, ECG strips, lab charts, or other medical images for AI analysis.</p>
+                <div id="imaging-container"></div>
+                <button type="button" id="add-imaging-btn" class="btn-secondary">+ Add Imaging Study</button>
+            </section>
+
+            <!-- Debate Mode Selection -->
+            <section class="form-section">
+                <h2>🎯 Discussion Mode</h2>
+                <div class="mode-selector">
+                    <label class="mode-option">
+                        <input type="radio" name="debate-mode" value="differential_diagnosis" checked>
+                        <div class="mode-card">
+                            <h3>Differential Diagnosis</h3>
+                            <p>Explore multiple possible diagnoses</p>
+                        </div>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="debate-mode" value="treatment_planning">
+                        <div class="mode-card">
+                            <h3>Treatment Planning</h3>
+                            <p>Debate treatment options</p>
+                        </div>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="debate-mode" value="second_opinion">
+                        <div class="mode-card">
+                            <h3>Second Opinion</h3>
+                            <p>Independent diagnostic panel</p>
+                        </div>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="debate-mode" value="case_review">
+                        <div class="mode-card">
+                            <h3>Case Review</h3>
+                            <p>Retrospective analysis</p>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Submit -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary btn-large">Start Medical Discussion</button>
+            </div>
+        </form>
+
+        <!-- Red Flag Warning -->
+        <div id="red-flag-warning" class="red-flag-warning" style="display:none;" role="alert">
+            <h2>⚠️ RED FLAGS DETECTED</h2>
+            <div id="red-flag-list"></div>
+            <p class="warning-text">
+                This case contains warning signs that may indicate serious conditions.
+                <strong>Seek immediate medical attention if this is a real patient.</strong>
+            </p>
+            <button id="acknowledge-red-flags-btn" class="btn-primary">I Understand - Continue to Discussion</button>
+        </div>
+    </div>
+
+    <script src="/js/medical-input.js"></script>
+</body>
+</html>

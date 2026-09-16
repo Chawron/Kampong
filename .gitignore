@@ -1,0 +1,47 @@
+# Kampong — local config & runtime artifacts. Do not commit.
+
+# Live config (contains API keys)
+config.yaml
+
+# API key files
+api.txt
+*.key
+*.pem
+
+# Built binary
+kampong.exe
+kampong
+*.exe
+
+# Runtime data
+data/
+data.tar
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-journal
+
+# Logs
+*.log
+logs/
+
+# Local env overrides
+.env
+.env.*
+!.env.example
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Test caches
+*.test
+*.out
+coverage.html
+
+# Vendor (only if you vendor manually)
+vendor/

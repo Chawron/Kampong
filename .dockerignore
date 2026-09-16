@@ -1,0 +1,18 @@
+# Files not needed inside the build context.
+.git
+.github
+.idea
+.vscode
+data
+*.log
+*.sqlite
+*.db
+Dockerfile
+.dockerignore
+README.md
+PRODUCT_OVERVIEW.md
+SYSTEM_SUMMARY.md
+api.txt
+kampong.exe
+*.test
+coverage.html

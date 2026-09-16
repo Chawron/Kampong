@@ -1,0 +1,81 @@
+llm:
+    provider: openai
+    base_url: https://api.openai.com/v1
+    api_key: "YOUR_API_KEY_HERE"
+    model: gpt-4o
+    fast_model: gpt-4o-mini
+    temperature: 0.7
+    max_tokens: 16384
+providers:
+    # ── Anthropic Claude (different family from OpenAI → better debate diversity) ──
+    - name: claude-opus
+      base_url: https://api.anthropic.com/v1
+      api_key: "YOUR_ANTHROPIC_KEY"
+      model: claude-opus-5-20250815
+      vision_model: claude-opus-5-20250815
+      family: anthropic
+      enabled: true
+
+    # ── Google Gemini (third family → three-way diversity) ──
+    - name: gemini-pro
+      base_url: https://generativelanguage.googleapis.com/v1beta/openai
+      api_key: "YOUR_GEMINI_KEY"
+      model: gemini-2.5-pro
+      vision_model: gemini-2.5-pro
+      family: google
+      enabled: true
+
+    # ── Local Ollama (free, fully offline) ──
+    # Ollama serves an OpenAI-compat shim at http://localhost:11434/v1
+    # First run: `ollama pull llama3.1`
+    - name: ollama-llama
+      base_url: http://localhost:11434/v1
+      api_key: "ollama"            # Ollama ignores the key but the field is required
+      model: llama3.1
+      vision_model: ""
+      family: ollama
+      enabled: false               # flip to true after pulling the model
+
+    # ── DeepSeek (low cost, strong reasoning) ──
+    - name: deepseek
+      base_url: https://api.deepseek.com/v1
+      api_key: "YOUR_DEEPSEEK_KEY"
+      model: deepseek-chat
+      vision_model: ""
+      family: deepseek
+      enabled: false
+
+search:
+    provider: duckduckgo
+    tavily_api_key: ""
+debate:
+    default_mode: deep
+    panel:
+        total_agents: 6
+        core_count: 2
+        adjacent_count: 2
+        practitioner_count: 1
+        lay_count: 1
+    scoring:
+        evidence_weight: 0.4
+        logic_weight: 0.35
+        novelty_weight: 0.25
+    context:
+        full_detail_rounds: 1
+        max_context_words: 2000
+        summarise_older_than: 2
+    # ON by default: an out-of-family LLM re-reads the verdict and flags weak claims.
+    cross_family_verifier: true
+timeouts:
+    llm_completion: 5m0s
+    llm_analyzer: 2m0s
+    llm_judge: 5m0s
+    llm_extractor: 2m0s
+    search: 10s
+    ws_ping: 30s
+storage:
+    backend: sqlite               # "json" (legacy, default if unset) or "sqlite"
+    sqlite_path: data/kampong.db
+server:
+    host: 0.0.0.0
+    port: 9090

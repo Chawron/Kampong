@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kampong — AI Debate Arena</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<!-- ── Landing / Dashboard ── -->
+<div id="landing" class="view active">
+  <header class="dashboard-header">
+    <div class="brand">
+      <span class="brand-icon">🏟</span>
+      <span class="brand-name">Kampong</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" onclick="toggleConfigSection()" title="Settings" aria-label="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1 class="hero-title">AI Expert Debate Arena</h1>
+      <p class="hero-subtitle">Watch AI agents debate, discuss, and synthesize knowledge from multiple perspectives</p>
+    </section>
+
+    <!-- Stats Grid -->
+    <section class="stats-grid" id="stats-section">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-debates">0</div>
+        <div class="stat-label">Debates</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-agents">0</div>
+        <div class="stat-label">Agents</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-topics">0</div>
+        <div class="stat-label">Topics Explored</div>
+      </div>
+      <div class="stat-card stat-card-accent">
+        <div class="stat-value">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="stat-label">Ready to Debate</div>
+      </div>
+    </section>
+
+    <!-- New Debate Card -->
+    <section class="new-debate-card">
+      <div class="card-header">
+        <h2>New Debate</h2>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="topic">Topic</label>
+          <textarea id="topic" placeholder="What should the agents discuss?" rows="2" autofocus></textarea>
+          <span class="form-hint">Press Enter to start, Shift+Enter for new line</span>
+          
+          <!-- File Attachment Area -->
+          <div class="file-attachment-area" id="file-attachment-area">
+            <div class="file-drop-zone" id="file-drop-zone">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+              <span>Drop files here or click to attach</span>
+              <span class="file-hint">Images, PDFs, text files (max 10MB)</span>
+            </div>
+            <input type="file" id="file-input" multiple accept="image/*,.pdf,.txt,.md" style="display:none">
+            <div class="attached-files-list" id="attached-files-list"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mode</label>
+          <div class="mode-chips">
+            <button class="mode-chip active" data-mode="deep" onclick="selectMode(this)">
+              <span class="mode-chip-name">Deep</span>
+              <span class="mode-chip-desc">5 rounds</span>
+            </button>
+            <button class="mode-chip" data-mode="standard" onclick="selectMode(this)">
+              <span class="mode-chip-name">Standard</span>
+              <span class="mode-chip-desc">3 rounds</span>
+            </button>
+            <button class="mode-chip" data-mode="quick" onclick="selectMode(this)">
+              <span class="mode-chip-name">Quick</span>
+              <span class="mode-chip-desc">2 rounds</span>
+            </button>
+            <button class="mode-chip" data-mode="discussion" onclick="selectMode(this)">
+              <span class="mode-chip-name">Discussion</span>
+              <span class="mode-chip-desc">4 rounds</span>
+            </button>
+            <button class="mode-chip mode-chip-medical" data-mode="medical" onclick="location.href='/medical-input.html'" title="Structured clinical case analysis with red-flag detection, drug interactions, labs, and differential diagnosis">
+              <span class="mode-chip-name">⚕ Medical</span>
+              <span class="mode-chip-desc">Clinical case</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="start-btn" class="btn-primary btn-lg" onclick="startDebate()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Debate
+        </button>
+      </div>
+    </section>
+
+    <!-- Config Section (collapsible) -->
+    <section class="config-card" id="config-section" style="display:none">
+      <div class="card-header" onclick="toggleConfigSection()">
+        <h2>Configuration</h2>
+        <span class="config-toggle-icon">▾</span>
+      </div>
+      <div class="card-body" id="config-body">
+        <div class="config-grid">
+          <div class="form-group">
+            <label for="cfg-api-key">API Key <span class="required">*</span></label>
+            <input type="password" id="cfg-api-key" placeholder="sk-...">
+          </div>
+          <div class="form-group">
+            <label for="cfg-model">Model</label>
+            <input type="text" id="cfg-model" placeholder="gpt-4o">
+          </div>
+          <div class="form-group">
+            <label for="cfg-base-url">Endpoint</label>
+            <input type="text" id="cfg-base-url" placeholder="https://api.openai.com/v1">
+          </div>
+          <div class="form-group">
+            <label for="cfg-tavily-key">Search Key</label>
+            <input type="password" id="cfg-tavily-key" placeholder="tvly-... (optional)">
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="saveSettings()">Save</button>
+        <span id="config-status" class="config-status"></span>
+      </div>
+    </section>
+
+    <!-- Provider Management Section -->
+    <section class="providers-card" id="providers-section">
+      <div class="card-header">
+        <h2>LLM Providers</h2>
+        <button class="btn-ghost btn-sm" onclick="showAddProviderForm()">+ Add Provider</button>
+      </div>
+      <div class="card-body">
+        <div id="providers-list" class="providers-list">
+          <!-- Providers will be loaded here -->
+        </div>
+        <div id="add-provider-form" class="add-provider-form" style="display:none">
+          <h3>Add New Provider</h3>
+          <div class="form-group">
+            <label for="provider-name">Provider Name</label>
+            <input type="text" id="provider-name" placeholder="e.g., deepseek, qwen, openai">
+          </div>
+          <div class="form-group">
+            <label for="provider-base-url">Base URL</label>
+            <input type="text" id="provider-base-url" placeholder="https://api.deepseek.com/v1">
+          </div>
+          <div class="form-group">
+            <label for="provider-api-key">API Key</label>
+            <input type="password" id="provider-api-key" placeholder="sk-...">
+          </div>
+          <div class="form-group">
+            <label for="provider-model">Default Model</label>
+            <input type="text" id="provider-model" placeholder="deepseek-chat">
+          </div>
+          <div class="form-group">
+            <label for="provider-vision-model">Vision Model (optional)</label>
+            <input type="text" id="provider-vision-model" placeholder="deepseek-vl (for image support)">
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="provider-enabled" checked>
+              Enabled
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="saveProvider()">Save Provider</button>
+            <button class="btn-ghost" onclick="hideAddProviderForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Debates -->
+    <section class="recent-section" id="past-debates-section" style="display:none">
+      <div class="section-header">
+        <h2>Recent Debates</h2>
+        <button class="btn-ghost btn-sm" onclick="loadPastDebates()">Refresh</button>
+      </div>
+      <div class="debates-list" id="past-debates-list"></div>
+    </section>
+  </main>
+</div>
+
+<!-- ── Arena View ── -->
+<div id="arena" class="view">
+  <!-- Pause Banner -->
+  <div id="pause-banner" class="pause-banner hidden">
+    <span class="pause-banner-icon">⏸</span>
+    <span class="pause-banner-text">Debate Paused</span>
+    <button class="btn-sm btn-resume" onclick="resumeDebate()">▶ Resume</button>
+  </div>
+
+  <!-- Medical Disclaimer Banner -->
+  <div id="medical-disclaimer" class="medical-disclaimer hidden" role="alert">
+    ⚕ <strong>Educational use only.</strong> This AI discussion is not medical advice,
+    diagnosis, or treatment. Seek a licensed professional for clinical decisions.
+  </div>
+
+  <header class="arena-header">
+    <button class="btn-ghost" onclick="goHome()" title="Back to dashboard" aria-label="Back to dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <h1 class="topic-display" id="arena-topic"></h1>
+    <div class="arena-meta">
+      <span id="mode-badge" class="badge"></span>
+      <span id="phase-indicator" class="phase-indicator">Initializing...</span>
+      <span id="round-counter" class="round-counter"></span>
+    </div>
+    <div class="progress-mini">
+      <div class="progress-mini-bar">
+        <div id="debate-progress-fill" class="progress-mini-fill" style="width:0%"></div>
+      </div>
+      <span id="debate-progress-text" class="progress-mini-text">0%</span>
+    </div>
+    <!-- Debate Control Bar -->
+    <div class="debate-control-bar" id="debate-control-bar">
+      <button class="debate-ctrl-btn" id="btn-pause-resume" onclick="togglePauseResume()" title="Pause debate" aria-label="Pause debate">
+        <span id="pause-resume-icon">⏸</span>
+      </button>
+      <button class="debate-ctrl-btn" onclick="openInjectModal()" title="Inject evidence" aria-label="Inject evidence">💉</button>
+      <button class="debate-ctrl-btn" onclick="openChallengeModal()" title="Challenge a claim" aria-label="Challenge a claim">🎯</button>
+    </div>
+  </header>
+
+  <div class="arena-main">
+    <!-- Panel -->
+    <aside class="panel-sidebar" id="panel-sidebar">
+      <h3 class="sidebar-title">Panel</h3>
+      <div class="panel-list" id="panel-list"></div>
+    </aside>
+
+    <!-- Debate Feed -->
+    <main class="debate-feed" id="debate-feed">
+      <div class="feed-content" id="feed-content" aria-live="polite"></div>
+      <button id="autoscroll-toggle" type="button" class="autoscroll-btn active" onclick="toggleAutoScroll()" title="Auto-scroll ON" aria-label="Toggle auto-scroll">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+      </button>
+      <button type="button" id="new-message-indicator" class="new-msg-indicator hidden" onclick="scrollFeed(true)">
+        New messages ↓
+      </button>
+    </main>
+
+    <!-- Knowledge Base -->
+    <aside class="kb-panel" id="graph-panel">
+      <div class="kb-header">
+        <h3>Knowledge Base</h3>
+        <div class="kb-view-toggle">
+          <button class="kb-toggle active" data-view="graph" onclick="switchKBView('graph')">Graph</button>
+          <button class="kb-toggle" data-view="list" onclick="switchKBView('list')">Notes</button>
+        </div>
+        <input type="text" id="graph-search" class="kb-search" placeholder="Search..." aria-label="Search knowledge base">
+        <div class="kb-filters" id="graph-filter-group">
+          <button class="kb-filter active" data-filter="all">All</button>
+          <button class="kb-filter" data-filter="claim">Claims</button>
+          <button class="kb-filter" data-filter="concept">Concepts</button>
+          <button class="kb-filter" data-filter="evidence">Evidence</button>
+        </div>
+      </div>
+
+      <!-- Graph View -->
+      <div id="graph-view-container" class="kb-view active">
+        <div id="graph-container"></div>
+        <div class="kb-zoom">
+          <button onclick="graphZoomIn()" title="Zoom in" aria-label="Zoom in">+</button>
+          <button onclick="graphZoomOut()" title="Zoom out" aria-label="Zoom out">−</button>
+          <button onclick="graphZoomReset()" title="Reset" aria-label="Reset zoom">⟲</button>
+        </div>
+        <div id="graph-legend" class="kb-legend">
+          <span><span class="dot" style="background:#4ade80"></span> supports</span>
+          <span><span class="dot" style="background:#f87171"></span> contradicts</span>
+          <span><span class="dot" style="background:#60a5fa"></span> cites</span>
+        </div>
+      </div>
+
+      <!-- Notes View -->
+      <div id="list-view-container" class="kb-view">
+        <div id="notes-list" class="notes-list"></div>
+        <div id="notes-empty" class="notes-empty">
+          <span class="notes-empty-icon">📝</span>
+          <p>Notes appear as agents speak</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ── Inject Evidence Modal ── -->
+<div id="inject-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <header class="modal-header">
+      <h2>💉 Inject Evidence</h2>
+      <button class="modal-close-btn" onclick="closeInjectModal()" aria-label="Close dialog">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="inject-target-agent">Target Agent</label>
+        <select id="inject-target-agent">
+          <option value="">All agents (general)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="inject-text">Evidence / Context</label>
+        <textarea id="inject-text" rows="5" placeholder="Paste evidence, data, or context to inject into the debate..."></textarea>
+      </div>
+    </div>
+    <footer class="modal-footer">
+      <button class="btn-ghost" onclick="closeInjectModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitInjection()">Inject</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Challenge Claim Modal ── -->
+<div id="challenge-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <header class="modal-header">
+      <h2>🎯 Challenge a Claim</h2>
+      <button class="modal-close-btn" onclick="closeChallengeModal()" aria-label="Close dialog">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Claims Made During Debate</label>
+        <div id="challenge-claims-list" class="claims-list">
+          <p class="empty-state">No claims available yet.</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="challenge-text">Your Challenge</label>
+        <textarea id="challenge-text" rows="3" placeholder="Why do you think this claim is incorrect or needs more evidence?"></textarea>
+      </div>
+    </div>
+    <footer class="modal-footer">
+      <button class="btn-ghost" onclick="closeChallengeModal()">Cancel</button>
+      <button class="btn-primary" id="submit-challenge-btn" onclick="submitChallenge()" disabled>Submit Challenge</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ── Verdict Overlay ── -->
+<div id="verdict-overlay" class="verdict-overlay hidden">
+  <div class="verdict-card">
+    <header class="verdict-header">
+      <h2 id="verdict-title">🏆 Verdict</h2>
+      <button class="verdict-close-btn" onclick="closeVerdict()" aria-label="Close verdict">×</button>
+    </header>
+
+    <div id="verdict-winner" class="verdict-winner"></div>
+    <div id="verdict-scorecard" class="verdict-scorecard"></div>
+
+    <div id="verdict-consolidated-claims" class="verdict-section"></div>
+    <div id="verdict-consensus" class="verdict-section"></div>
+    <div id="verdict-unresolved" class="verdict-section"></div>
+    <div id="verdict-synthesis" class="verdict-section"></div>
+    <div id="verdict-turning-points" class="verdict-section"></div>
+    <div id="verdict-reasoning" class="verdict-section"></div>
+
+    <div id="synthesis-insights" class="verdict-section"></div>
+    <div id="synthesis-themes" class="verdict-section"></div>
+    <div id="synthesis-surprising" class="verdict-section"></div>
+    <div id="synthesis-questions" class="verdict-section"></div>
+    <div id="synthesis-overview" class="verdict-section"></div>
+
+    <!-- Post-Debate Analysis Panel -->
+    <div id="post-debate-analysis" class="verdict-section collapsible-section">
+      <div class="collapsible-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleCollapsible(this)" onkeydown="collapsibleKeydown(event, this)">
+        <h3>📊 Post-Debate Analysis</h3>
+        <span class="collapsible-arrow">▸</span>
+      </div>
+      <div class="collapsible-body" id="post-debate-body">
+        <div id="analysis-calibration" class="analysis-subsection"></div>
+        <div id="analysis-consistency" class="analysis-subsection"></div>
+        <div id="analysis-critique" class="analysis-subsection"></div>
+      </div>
+    </div>
+
+    <!-- Social Simulation Panel -->
+    <div id="social-simulation-section" class="verdict-section collapsible-section">
+      <div class="collapsible-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleCollapsible(this)" onkeydown="collapsibleKeydown(event, this)">
+        <h3>🌐 Public Reaction Simulation</h3>
+        <span class="collapsible-arrow">▸</span>
+      </div>
+      <div class="collapsible-body" id="social-simulation-body">
+        <button class="btn-secondary" id="btn-social-sim" onclick="triggerSocialSimulation()">
+          🌐 Simulate Public Reaction
+        </button>
+        <div id="social-results" class="social-results-container"></div>
+      </div>
+    </div>
+
+    <footer class="verdict-footer">
+      <button onclick="exportReport('md')" class="btn-ghost">📄 Markdown</button>
+      <button onclick="exportReport('html')" class="btn-ghost">📋 Print / PDF</button>
+    </footer>
+  </div>
+</div>
+
+<script src="/js/ws.js"></script>
+<script src="/js/graph.js"></script>
+<script src="/js/arena.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
