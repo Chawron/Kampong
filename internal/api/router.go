@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -385,11 +386,42 @@ func (s *Server) handleDebateHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	transcript := session.GetTranscript()
+
+	// Pagination: ?limit=N&offset=M
+	limit := 100
+	offset := 0
+	if v := r.URL.Query().Get("limit"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 && n <= 500 {
+			limit = n
+		}
+	}
+	if v := r.URL.Query().Get("offset"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			offset = n
+		}
+	}
+
+	total := len(transcript)
+	end := offset + limit
+	if end > total {
+		end = total
+	}
+	var page []models.TranscriptEntry
+	if offset < total {
+		page = transcript[offset:end]
+	} else {
+		page = []models.TranscriptEntry{}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"debate_id":  session.ID,
 		"topic":      session.Topic,
-		"transcript": session.GetTranscript(),
+		"transcript": page,
+		"total":      total,
+		"limit":      limit,
+		"offset":     offset,
 	})
 }
 
@@ -894,7 +926,39 @@ func (s *Server) handleListDebates(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"debates": items})
+
+	// Pagination: ?limit=N&offset=M
+	limit := 50
+	offset := 0
+	if v := r.URL.Query().Get("limit"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n > 0 && n <= 200 {
+			limit = n
+		}
+	}
+	if v := r.URL.Query().Get("offset"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			offset = n
+		}
+	}
+
+	total := len(items)
+	end := offset + limit
+	if end > total {
+		end = total
+	}
+	var page []debateItem
+	if offset < total {
+		page = items[offset:end]
+	} else {
+		page = []debateItem{}
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"debates": page,
+		"total":   total,
+		"limit":   limit,
+		"offset":  offset,
+	})
 }
 
 // handleDeleteDebate removes a debate from memory and disk.
