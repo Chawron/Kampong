@@ -125,7 +125,7 @@ func (e *Engine) Run(ctx context.Context, session *models.DebateSession) {
 			DebateID: session.ID,
 			Data: map[string]interface{}{
 				"phase":        string(phase.status),
-				"round":        session.Round,
+				"round":        session.GetRound(),
 				"total_rounds": session.TotalRounds,
 				"mode":         string(session.Mode),
 				"message":      phase.message,
@@ -282,12 +282,12 @@ func (e *Engine) executeRound(ctx context.Context, session *models.DebateSession
 
 		// Build transcript entry
 		entry := &models.TranscriptEntry{
-			ID:            fmt.Sprintf("entry-%d-%s-%d", session.Round, ag.ID, len(session.GetTranscript())),
+			ID:            fmt.Sprintf("entry-%d-%s-%d", session.GetRound(), ag.ID, len(session.GetTranscript())),
 			AgentID:       ag.ID,
 			AgentName:     ag.Name,
 			AgentRole:     ag.Role,
 			RoleType:      ag.RoleType,
-			Round:         session.Round,
+			Round:         session.GetRound(),
 			Phase:         models.DebateStatus(phase),
 			Text:          fullText,
 			Confidence:    confidence,

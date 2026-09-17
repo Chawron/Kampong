@@ -724,7 +724,7 @@ func (s *Server) replayState(conn *websocket.Conn, session *models.DebateSession
 		DebateID: session.ID,
 		Data: map[string]interface{}{
 			"phase":        string(session.GetStatus()),
-			"round":        session.Round,
+			"round":        session.GetRound(),
 			"total_rounds": session.TotalRounds,
 			"mode":         string(session.Mode),
 		},
