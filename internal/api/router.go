@@ -564,6 +564,13 @@ func (s *Server) handleUpdateConfig(w http.ResponseWriter, r *http.Request) {
 		if key, ok := v.(string); ok {
 			s.cfg.LLM.APIKey = key
 			s.llmClient.SetAPIKey(key)
+			// Sync to any provider using the same base URL
+			for i := range s.cfg.Providers {
+				if s.cfg.Providers[i].BaseURL == s.cfg.LLM.BaseURL {
+					s.cfg.Providers[i].APIKey = key
+					s.clientManager.UpdateProviderKey(s.cfg.Providers[i].Name, key)
+				}
+			}
 			// Propagate to ALL components
 			if s.medicalAPI != nil {
 				s.medicalAPI.SetLLMClient(s.llmClient)
@@ -1211,12 +1218,18 @@ func (s *Server) handleAddProvider(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleDeleteProvider(w http.ResponseWriter, r *http.Request) {
 	name := chi.URLParam(r, "name")
 
-	// Remove from config
+	// Remove from config — track whether we actually found it
+	found := false
 	for i, p := range s.cfg.Providers {
 		if p.Name == name {
 			s.cfg.Providers = append(s.cfg.Providers[:i], s.cfg.Providers[i+1:]...)
+			found = true
 			break
 		}
+	}
+	if !found {
+		http.Error(w, `{"error":"provider not found"}`, http.StatusNotFound)
+		return
 	}
 
 	// Remove from client manager

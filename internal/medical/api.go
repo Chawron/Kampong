@@ -603,7 +603,8 @@ IMPORTANT:
 		},
 	}
 
-	ctx := r.Context()
+	ctx, imgCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer imgCancel()
 	response, err := m.imageAnalyzer.client.Complete(ctx, messages, 0.1, 4096)
 	if err != nil {
 		http.Error(w, `{"error":"failed to analyze image: `+err.Error()+`"}`, http.StatusInternalServerError)
@@ -775,7 +776,8 @@ func (m *MedicalAPI) HandleImageAnalysis(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ctx := r.Context()
+	ctx, imgCtxCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer imgCtxCancel()
 	result, err := m.imageAnalyzer.AnalyzeImage(ctx, image, req.ClinicalContext)
 	if err != nil {
 		http.Error(w, "Failed to analyze image: "+err.Error(), http.StatusInternalServerError)
@@ -854,7 +856,8 @@ func (m *MedicalAPI) HandleSecondOpinion(w http.ResponseWriter, r *http.Request)
 		req.NumPanels = 2
 	}
 
-	ctx := r.Context()
+	ctx, soCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer soCancel()
 	result, err := m.secondOpinion.RunSecondOpinion(ctx, &req.CaseData, req.NumPanels)
 	if err != nil {
 		http.Error(w, "Failed to run second opinion: "+err.Error(), http.StatusInternalServerError)
@@ -886,7 +889,8 @@ func (m *MedicalAPI) HandleLiteratureSearch(w http.ResponseWriter, r *http.Reque
 		req.Options.MaxResults = 10
 	}
 
-	ctx := r.Context()
+	ctx, litCancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer litCancel()
 	result, err := m.literatureSearcher.SearchLiterature(ctx, req.Query, req.Options)
 	if err != nil {
 		http.Error(w, "Failed to search literature: "+err.Error(), http.StatusInternalServerError)
@@ -977,7 +981,8 @@ func (m *MedicalAPI) HandleDifferentialRanking(w http.ResponseWriter, r *http.Re
 		caseData.RedFlags = m.redFlags.DetectRedFlags(&caseData)
 	}
 
-	ctx := r.Context()
+	ctx, diffCancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer diffCancel()
 	rankings, err := GenerateDifferentialRanking(ctx, m.imageAnalyzer.client, &caseData)
 	if err != nil {
 		http.Error(w, "Failed to generate differential ranking: "+err.Error(), http.StatusInternalServerError)

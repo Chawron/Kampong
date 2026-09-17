@@ -116,6 +116,15 @@ func (cm *ClientManager) RemoveProvider(name string) {
 	delete(cm.clients, name)
 }
 
+// UpdateProviderKey updates the API key for a specific provider.
+func (cm *ClientManager) UpdateProviderKey(name, apiKey string) {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+	if entry, ok := cm.clients[name]; ok {
+		entry.Client.SetAPIKey(apiKey)
+	}
+}
+
 // ListProviders returns all configured provider names.
 func (cm *ClientManager) ListProviders() []string {
 	cm.mu.RLock()
